@@ -10,35 +10,37 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 val networkModule = module {
-    single {
-        val clientBuilder = OkHttpClient.Builder()
-        val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-
-        clientBuilder
-            .addInterceptor(loggingInterceptor)
-            .connectTimeout(120, TimeUnit.SECONDS)
-            .writeTimeout(120, TimeUnit.SECONDS)
-            .readTimeout(120, TimeUnit.SECONDS)
-
-        clientBuilder.build()
-    }
+    factory { GsonConverterFactory.create() }
+    factory { CoroutineCallAdapterFactory() }
+    factory { provideInterceptor() }
+    factory { provideOkHttp(get()) }
 
     single {
-        GsonConverterFactory.create()
+        provideRetrofit(get(), get(), get())
     }
+}
 
-    single {
-        CoroutineCallAdapterFactory()
-    }
+private fun provideInterceptor() : HttpLoggingInterceptor {
+    val loggingInterceptor = HttpLoggingInterceptor()
+    loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+    return loggingInterceptor
+}
 
-    single {
-        Retrofit.Builder()
-            .baseUrl("https://api.first.org/data/")
-            .client(get())
-            .addConverterFactory(get<GsonConverterFactory>())
-            .addCallAdapterFactory(get<CoroutineCallAdapterFactory>())
-            .build()
-            .create(ApiServise::class.java)
-    }
+private fun provideOkHttp(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+    return OkHttpClient.Builder()
+        .addInterceptor(httpLoggingInterceptor)
+        .connectTimeout(120, TimeUnit.SECONDS)
+        .writeTimeout(120, TimeUnit.SECONDS)
+        .readTimeout(120, TimeUnit.SECONDS)
+        .build()
+}
+
+private fun provideRetrofit(okHttpClient: OkHttpClient, gsonConverterFactory: GsonConverterFactory, coroutineCallAdapterFactory: CoroutineCallAdapterFactory): ApiServise {
+    return Retrofit.Builder()
+        .baseUrl("https://api.first.org/data/")
+        .client(okHttpClient)
+        .addConverterFactory(gsonConverterFactory)
+        .addCallAdapterFactory(coroutineCallAdapterFactory)
+        .build()
+        .create(ApiServise::class.java)
 }

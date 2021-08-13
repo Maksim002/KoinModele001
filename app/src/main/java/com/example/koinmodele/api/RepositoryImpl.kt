@@ -8,7 +8,7 @@ import com.timelysoft.tsjdomcom.service.ResultStatus
 import kotlinx.coroutines.Dispatchers
 
 //Несмог отсюда запустить проект запрос
-class Repository(private val apiServise: ApiServise): BaseRepository {
+class RepositoryImpl(private val apiServise: ApiServise): BaseRepository {
     override fun requestCountryDetails(): LiveData<ResultStatus<ExampleModel>> {
         val result  = liveData<ResultStatus<ExampleModel>>(Dispatchers.IO) {
             try {

@@ -9,37 +9,24 @@ class ExampleModel (
     @SerializedName("status")
     @Expose
     var status: String? = null,
-
-
     @SerializedName("status-code")
     @Expose
     var statusCode: Int? = null,
-
-
     @SerializedName("version")
     @Expose
     var version: String? = null,
-
-
     @SerializedName("total")
     @Expose
     var total: Int? = null,
-
-
     @SerializedName("limit")
     @Expose
     var limit: Int? = null,
-
-
     @SerializedName("offset")
     @Expose
     var offset: Int? = null,
-
-
     @SerializedName("access")
     @Expose
     var access: String? = null,
-
     @SerializedName("data")
     @Expose
     var data : Map<String, Data>? = null
